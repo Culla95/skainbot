@@ -1,4 +1,5 @@
 use std::process::Stdio;
+use std::path::Path;
 use tokio::process::Command;
 use serde::{Deserialize, Serialize};
 use anyhow::{Context, Result};
@@ -31,16 +32,24 @@ pub async fn search_query(query: &str, requester: UserId) -> Result<Vec<Track>> 
         format!("ytsearch1:{}", query)
     };
 
-    let output = Command::new("yt-dlp")
-        .arg("--dump-single-json")
+    let mut cmd = Command::new("yt-dlp");
+    cmd.arg("--dump-single-json")
         .arg("--no-warnings")
         .arg("--skip-download")
         .arg("--flat-playlist")
         .arg("--extractor-args")
-        .arg("youtube:player-client=web,default")
-        .arg(&arg)
+        .arg("youtube:player-client=android,web,mweb")
+        .arg("--user-agent")
+        .arg("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+        .arg(&arg);
+
+    if Path::new("cookies.txt").exists() {
+        cmd.arg("--cookies").arg("cookies.txt");
+    }
+
+    let output = cmd
         .stdout(Stdio::piped())
-        .stderr(Stdio::piped()) // Capture stderr to debug if fails
+        .stderr(Stdio::piped())
         .spawn()
         .context("Failed to spawn yt-dlp")?
         .wait_with_output()
@@ -86,15 +95,22 @@ pub async fn search_query(query: &str, requester: UserId) -> Result<Vec<Track>> 
     Ok(tracks)
 }
 
-// Function to get direct audio URL for streaming (Just-in-time)
 pub async fn get_direct_url(url: &str) -> Result<String> {
-    let output = Command::new("yt-dlp")
-        .arg("-f")
+    let mut cmd = Command::new("yt-dlp");
+    cmd.arg("-f")
         .arg("bestaudio")
         .arg("--extractor-args")
-        .arg("youtube:player-client=web,default")
+        .arg("youtube:player-client=android,web,mweb")
+        .arg("--user-agent")
+        .arg("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
         .arg("--get-url")
-        .arg(url)
+        .arg(url);
+
+    if Path::new("cookies.txt").exists() {
+        cmd.arg("--cookies").arg("cookies.txt");
+    }
+
+    let output = cmd
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
@@ -104,7 +120,8 @@ pub async fn get_direct_url(url: &str) -> Result<String> {
         .context("Failed to wait for yt-dlp")?;
     
     if !output.status.success() {
-        anyhow::bail!("yt-dlp get-url failed");
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        anyhow::bail!("yt-dlp get-url failed: {}", stderr);
     }
     
     let stdout = String::from_utf8_lossy(&output.stdout);

@@ -10,6 +10,7 @@ pub async fn get_ffmpeg_input(url: String) -> Result<Input> {
             "-reconnect", "1",
             "-reconnect_streamed", "1",
             "-reconnect_delay_max", "5",
+            "-user_agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             "-i", &url,
             "-vn",
             "-f", "f32le", 
