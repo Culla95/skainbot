@@ -38,13 +38,17 @@ pub async fn search_query(query: &str, requester: UserId) -> Result<Vec<Track>> 
         .arg("--skip-download")
         .arg("--flat-playlist")
         .arg("--extractor-args")
-        .arg("youtube:player-client=android,web,mweb")
+        .arg("youtube:player-client=ios,android,mweb")
+        .arg("--force-ipv4")
         .arg("--user-agent")
-        .arg("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+        .arg("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1")
         .arg(&arg);
 
     if Path::new("cookies.txt").exists() {
+        log::info!("Using cookies.txt for search");
         cmd.arg("--cookies").arg("cookies.txt");
+    } else {
+        log::warn!("cookies.txt NOT found in current directory!");
     }
 
     let output = cmd
@@ -100,13 +104,15 @@ pub async fn get_direct_url(url: &str) -> Result<String> {
     cmd.arg("-f")
         .arg("bestaudio")
         .arg("--extractor-args")
-        .arg("youtube:player-client=android,web,mweb")
+        .arg("youtube:player-client=ios,android,mweb")
+        .arg("--force-ipv4")
         .arg("--user-agent")
-        .arg("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+        .arg("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1")
         .arg("--get-url")
         .arg(url);
 
     if Path::new("cookies.txt").exists() {
+        log::info!("Using cookies.txt for URL extraction");
         cmd.arg("--cookies").arg("cookies.txt");
     }
 
