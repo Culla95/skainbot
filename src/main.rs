@@ -1,6 +1,7 @@
 use std::env;
 use std::sync::Arc;
 use std::time::Duration;
+use simplelog::*;
 
 use serenity::async_trait;
 use serenity::model::channel::Message;
@@ -314,6 +315,7 @@ impl songbird::EventHandler for TrackEndNotifier {
 
 #[tokio::main]
 async fn main() {
+    TermLogger::init(LevelFilter::Info, Config::default(), TerminalMode::Mixed, ColorChoice::Auto).unwrap();
 
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
