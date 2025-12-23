@@ -46,7 +46,3 @@ cargo run --release
 -   **Streaming**: Spawns `ffmpeg` with `-re` (real-time) flag to pipe audio to Songbird.
 -   **Extraction**: Uses `yt-dlp` to resolve specific media URLs without downloading files to disk.
 -   **Discord**: `serenity` for gateway/events, `songbird` for voice.
-
-## License
-
-MIT
