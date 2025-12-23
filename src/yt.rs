@@ -35,12 +35,9 @@ pub async fn search_query(query: &str, requester: UserId) -> Result<Vec<Track>> 
         .arg("--dump-single-json")
         .arg("--no-warnings")
         .arg("--skip-download")
-        .arg("--flat-playlist") // Don't recurse into playlists massively if not needed, but for "play <playlist>" we might want to.
-             // Actually, the requirements say "expand playlist". 
-             // If we use --flat-playlist we get entries with title/id/url but not full metadata.
-             // For performance/speed on large playlists, flat-playlist is better, getting full metadata just in time.
-             // But for simplicity let's try to get what we can.
-             // Re-reading requirements: "Si es URL que corresponde a playlist: expandir ... encolar todas".
+        .arg("--flat-playlist")
+        .arg("--extractor-args")
+        .arg("youtube:player-client=web,default")
         .arg(&arg)
         .stdout(Stdio::piped())
         .stderr(Stdio::piped()) // Capture stderr to debug if fails
@@ -94,6 +91,8 @@ pub async fn get_direct_url(url: &str) -> Result<String> {
     let output = Command::new("yt-dlp")
         .arg("-f")
         .arg("bestaudio")
+        .arg("--extractor-args")
+        .arg("youtube:player-client=web,default")
         .arg("--get-url")
         .arg(url)
         .stdout(Stdio::piped())

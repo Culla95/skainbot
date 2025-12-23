@@ -319,6 +319,7 @@ async fn main() {
 
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
+    #[allow(deprecated)]
     let framework = serenity::framework::StandardFramework::new(); // Warn is fine
 
     let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;

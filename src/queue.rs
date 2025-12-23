@@ -1,10 +1,10 @@
 use std::collections::VecDeque;
 use serenity::model::id::UserId;
 use parking_lot::Mutex;
-use std::sync::Arc;
 use std::time::Duration;
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct Track {
     pub title: String,
     pub channel: String,
@@ -19,6 +19,7 @@ pub struct QueueManager {
     queue: Mutex<VecDeque<Track>>,
 }
 
+#[allow(dead_code)]
 impl QueueManager {
     pub fn new() -> self::QueueManager {
         Self {
